@@ -1,0 +1,8 @@
+use Entity
+
+class Enemy is Entity
+    on create
+        SetHealth (1)
+        SetSpeed (3)
+    end
+end

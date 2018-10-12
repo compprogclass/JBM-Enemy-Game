@@ -1,0 +1,64 @@
+use Libraries.Game.Graphics.Drawable
+use Libraries.Compute.Math
+
+class Entity is Drawable
+    private integer health = 3
+    private number angle = 90
+    private Math calc
+    private number speed = 1
+
+    action GetSpeed returns number
+        return speed
+    end
+
+    action SetSpeed (number s)
+        speed = s
+    end
+
+    action GetHealth () returns integer
+        return health
+    end
+    
+    action SetHealth (integer h)
+        health = h
+    end
+
+    action GetCalc () returns Math
+        return calc
+    end
+
+    action InverseTangent (number x, number y) returns number
+        number r = calc:InverseTangent (x, y)
+        if y < 0
+            r = 2*calc:pi + r
+        end
+        return r
+    end
+
+    action point2  (number x, number y)
+        number delta_x = x-me:GetCenterX()
+        number delta_y = y-me:GetCenterY()
+        number a = calc:RadiansToDegrees(me:InverseTangent(delta_x, delta_y))
+        Rotate (angle - a)
+        angle = a
+    end
+
+    action approach (number x, number y)
+        number Xdir = 0
+        number Ydir = 0
+        if GetCenterX() > x
+            Xdir = -1
+        elseif GetCenterX() < x
+            Xdir = 1
+        end
+        
+        if GetCenterY() > y
+            Ydir = -1
+        elseif GetCenterY() < y
+            Ydir = 1
+        end
+        
+        me:Move (Xdir * me:GetSpeed(), Ydir * me:GetSpeed())
+    end
+
+end

@@ -1,0 +1,11 @@
+use Enemy
+
+class EnemyFactory
+    action CreateEnemy(integer x, integer y) returns Enemy
+        Enemy enemy
+        enemy:Load("images/enemy.png")
+        enemy:Scale (0.2)
+        enemy:SetPosition (x,y)
+        return enemy
+    end
+end

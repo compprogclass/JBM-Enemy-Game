@@ -1,0 +1,99 @@
+use Libraries.Game.Game
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.InputMonitor
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Events.MouseEvent
+use Libraries.Interface.Events.MouseMovementListener
+use Libraries.Containers.List
+use Libraries.Containers.Iterator
+use Libraries.Compute.Random
+
+//use Player
+//use Enemy
+//use Factories.EnemyFactory
+
+class Main is Game, MouseMovementListener
+    private Player player_one
+    private List<Enemy> enemies
+    //private Drawable player_one
+    private InputMonitor IM
+    private KeyboardEvent keys
+    private EnemyFactory EF
+    private integer UpTick = 0
+    private Random RNG
+    action Main
+        StartGame ()
+    end
+    action CreateGame
+        player_one:Load("images/player.jpg")
+        player_one:Scale (0.5)
+        player_one:SetPosition (GetScreenWidth () /2,GetScreenHeight () /2)
+        Add (player_one)
+        
+        Enemy enemy = EF:CreateEnemy(GetScreenWidth()/4,GetScreenHeight()/2)
+        Add (enemy)
+        enemies:Add(enemy)
+        AddMouseMovementListener (me)
+
+
+    /*  output (calc:RadiansToDegrees(InverseTangent(1, 1)))
+        output (calc:RadiansToDegrees(InverseTangent(-1, 1)))
+        output (calc:RadiansToDegrees(InverseTangent(-1, -1)))
+        output (calc:RadiansToDegrees(me:InverseTangent(1, -1)))
+    */
+
+
+    end
+    action MovedMouse (MouseEvent tracker)
+        player_one:point2(tracker:GetX(), tracker:GetY())
+    end
+
+    action DraggedMouse (MouseEvent tracker)
+        player_one:point2(tracker:GetX(), tracker:GetY())
+    end
+    action Update (number seconds)
+        UpTick = UpTick + 1
+        number up = 0.0
+        number right = 0.0
+        if IM:IsKeyPressed (keys:W)
+            up = up + player_one:GetSpeed()
+        end
+        if IM:IsKeyPressed(keys:S)
+            up = up - player_one:GetSpeed()
+        end
+         if IM:IsKeyPressed (keys:D)
+            right = right + player_one:GetSpeed()
+        end
+        if IM:IsKeyPressed(keys:A)
+            right = right - player_one:GetSpeed()
+        end
+
+//        output(UpTick)
+        if UpTick mod 200 = 0
+            List<Enemy> NewEnemies
+            Iterator<Enemy> it = enemies:GetIterator()
+            repeat while it:HasNext()
+                Enemy enemy = it:Next()
+                Remove (enemy)
+                Enemy child1 = EF:CreateEnemy(cast(integer, enemy:GetCenterX() + RNG:RandomIntegerBetween(-100, 100)),
+                                              cast(integer, enemy:GetCenterY() + RNG:RandomIntegerBetween(-100, 100)))
+                Enemy child2 = EF:CreateEnemy(cast(integer, enemy:GetCenterX() + RNG:RandomIntegerBetween(-100, 100)),
+                                              cast(integer, enemy:GetCenterY() + RNG:RandomIntegerBetween(-100, 100)))
+                me:Add(child1)
+                me:Add(child2)
+                NewEnemies:Add(child1)
+                NewEnemies:Add(child2)
+            end
+            enemies = NewEnemies
+        end
+
+        Iterator<Enemy> it = enemies:GetIterator()
+        repeat while it:HasNext()
+            Enemy enemy = it:Next()
+            enemy:Move (-right, -up)
+            enemy:point2 (player_one:GetCenterX(),player_one:GetCenterY())
+            enemy:approach(player_one:GetCenterX(),player_one:GetCenterY())  
+        end
+        
+    end
+end

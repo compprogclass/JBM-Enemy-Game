@@ -1,0 +1,10 @@
+use Entity
+
+class Player is Entity
+    on create
+        me:SetHealth (3)
+        me:SetSpeed (10)
+    end
+end
+
+
